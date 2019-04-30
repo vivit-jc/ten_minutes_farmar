@@ -24,15 +24,18 @@ TITLE_MENU_X = 30
 TITLE_MENU_Y = [360,392,424]
 TITLE_MENU_TEXT = ["START","STATS","RANKING"]
 
-MAIN_MENU_TEXT = ["牧場","畜舎","市場","活動","設備","会計"]
+MAIN_MENU_TEXT = {farm: "牧場", shed: "畜舎", market: "市場", cooperative: "農協", townhall: "役場", accounts: "会計"}
 
+CLOCK_HEIGHT = 40
 MESSAGE_BOX_HEIGHT = 100
 MAIN_MENU_WIDTH = 180
 MENU_EACH_HEIGHT = 30
+FARM_SIZE = 60
 
 Font12 = Font.new(12)
 Font16 = Font.new(16)
 Font20 = Font.new(20)
+Font24 = Font.new(24)
 Font28 = Font.new(28)
 Font32 = Font.new(32)
 Font50 = Font.new(50)
