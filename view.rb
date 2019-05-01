@@ -22,33 +22,35 @@ class View
   end
 
   def draw_game
-    draw_date
+    draw_header
     draw_main_menu
     draw_farm
+    draw_messages
   end
 
   def draw_farm
     4.times do |x|
       3.times do |y|
         Window.draw(30+(FARM_SIZE+10)*x,30+(FARM_SIZE+10)*y,@farmback)
-        if @game.farm[y][x][:kind] == :wasteland
+        if @game.farm[x+y*4][:kind] == :wasteland
           Window.draw_font(45+(FARM_SIZE+10)*x, 41+(FARM_SIZE+10)*y, "開墾", Font16)
-          Window.draw_font(45+(FARM_SIZE+10)*x, 61+(FARM_SIZE+10)*y, "#{@game.farm[y][x][:prog]}/#{@game.farm[y][x][:max]}", Font16)
+          Window.draw_font(45+(FARM_SIZE+10)*x, 61+(FARM_SIZE+10)*y, "#{@game.farm[x+y*4][:prog]}/#{@game.farm[x+y*4][:max]}", Font16)
         else
-          Window.draw_font(52+(FARM_SIZE+10)*x, 50+(FARM_SIZE+10)*y, @game.farm[y][x][:str], Font16)
+          Window.draw_font(52+(FARM_SIZE+10)*x, 50+(FARM_SIZE+10)*y, @game.farm[x+y*4][:str], Font16)
         end
       end
     end
   end
 
-  def draw_date
+  def draw_header
     date = @game.date
-    Window.draw_font(640 - MAIN_MENU_WIDTH, 8, "#{date[:year]}年目 #{season_j(date[:season])} 第#{date[:week]+1}週", Font24)
+    Window.draw_font(640 - MAIN_MENU_WIDTH, 4, "#{date[:year]}年目 #{season_j(date[:season])} 第#{date[:week]+1}週", Font22)
+    Window.draw_font(640 - MAIN_MENU_WIDTH+4, 33, "資金:#{@game.money} 評判:#{@game.reputation}", Font22)
   end
 
   def draw_main_menu
     MAIN_MENU_TEXT.each_with_index do |(k,v),i|
-      Window.draw_font(640 - MAIN_MENU_WIDTH + 30, CLOCK_HEIGHT+MENU_EACH_HEIGHT*i+5, v, Font20, mouseover_color(@controller.pos_main_menu == i)) 
+      Window.draw_font(640 - MAIN_MENU_WIDTH + 30, HEADER_HEIGHT+MENU_EACH_HEIGHT*i+5, v, Font20, mouseover_color(@controller.pos_main_menu == i)) 
     end
   end
 
@@ -61,9 +63,9 @@ class View
     end
   end
 
-  def draw_message
+  def draw_messages
     @game.messages.each_with_index do |text, i|
-      Window.draw_font(10, 480-MESSAGE_BOX_HEIGHT+i*22, text, Font20) 
+      Window.draw_font(10, 480-MESSAGE_BOX_HEIGHT+i*22, text, Font20) if text
     end
   end
 

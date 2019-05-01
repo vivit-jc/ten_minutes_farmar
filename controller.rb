@@ -36,11 +36,17 @@ class Controller
   end
 
   def click_on_game
-    if pos_main_menu != -1
-      @game.click_menu(pos_main_menu)
-    else
-      @game.click
+    @game.click_menu(pos_main_menu) if pos_main_menu != -1
+    @game.click_farm(pos_farm) if pos_farm != -1
+  end
+
+  def pos_farm
+    4.times do |x|
+      3.times do |y|
+        return x+y*4 if mcheck(30+(FARM_SIZE+10)*x,30+(FARM_SIZE+10)*y,30+FARM_SIZE+(FARM_SIZE+10)*x,30+FARM_SIZE+(FARM_SIZE+10)*y)
+      end
     end
+    return -1
   end
 
   def pos_title_menu
@@ -52,7 +58,7 @@ class Controller
 
   def pos_main_menu
     MAIN_MENU_TEXT.each_with_index do |menu, i|
-      return i if(mcheck(640-MAIN_MENU_WIDTH, CLOCK_HEIGHT+MENU_EACH_HEIGHT*i, 640, CLOCK_HEIGHT+MENU_EACH_HEIGHT*(i+1)))
+      return i if(mcheck(640-MAIN_MENU_WIDTH, HEADER_HEIGHT+MENU_EACH_HEIGHT*i, 640, HEADER_HEIGHT+MENU_EACH_HEIGHT*(i+1)))
     end
     return -1
   end
