@@ -24,13 +24,29 @@ TITLE_MENU_X = 30
 TITLE_MENU_Y = [360,392,424]
 TITLE_MENU_TEXT = ["START","STATS","RANKING"]
 
-MAIN_MENU_TEXT = {farm: "牧場", shed: "畜舎", market: "市場", cooperative: "農協", townhall: "役場", accounts: "会計", part: "パートを雇う"}
+MAIN_MENU_TEXT = {farm: "牧場", shed: "畜舎", order: "注文", market: "市場", cooperative: "農協", townhall: "役場", accounts: "会計", part: "パートを雇う"}
+
+SEEDS = [{name: "ジャガイモ", kind: :veg, planting: [0,1], grow: [1], cost: 20, value: 80},
+{name: "キャベツ", kind: :veg, planting: [0,1], grow: [1], cost: 20, value: 80},
+{name: "トマト", kind: :veg, planting: [0], grow: [1,2], cost: 20, value: 80},
+{name: "メロン", kind: :veg, planting: [0], grow: [1], cost: 20, value: 80},
+{name: "サツマイモ", kind: :veg, planting: [0], grow: [2], cost: 20, value: 80},
+{name: "小麦", kind: :veg, planting: [2], grow: [3], cost: 20, value: 80},
+{name: "リンゴ", kind: :flu, planting: [0,2], grow: [], cost: 20, value: 80},
+{name: "ブドウ", kind: :flu, planting: [0], grow: [], cost: 20, value: 80},
+{name: "チューリップ", kind: :flo, planting: [2], grow: [2], cost: 20, value: 80},
+{name: "ヒマワリ", kind: :flo, planting: [0], grow: [1], cost: 20, value: 80},
+{name: "マリーゴールド", kind: :flo, planting: [0], grow: [1,2], cost: 20, value: 80},
+{name: "コスモス", kind: :flo, planting: [1], grow: [1], cost: 20, value: 80},
+{name: "ユリ", kind: :flo, planting: [2], grow: [3], cost: 20, value: 80}
+]
+
 
 HEADER_HEIGHT = 60
 MESSAGE_BOX_HEIGHT = 80
 MAIN_MENU_WIDTH = 180
 MENU_EACH_HEIGHT = 30
-FARM_SIZE = 60
+FARM_SIZE = 100
 
 Font12 = Font.new(12)
 Font16 = Font.new(16)

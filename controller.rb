@@ -36,8 +36,13 @@ class Controller
   end
 
   def click_on_game
-    @game.click_menu(pos_main_menu) if pos_main_menu != -1
-    @game.click_farm(pos_farm) if pos_farm != -1
+    if pos_main_menu != -1
+      @game.click_menu(pos_main_menu)
+    elsif @game.mainview == :shop && pos_shop != -1
+      @game.click_shop(pos_shop)
+    elsif @game.mainview == :farm && pos_farm != -1
+      @game.click_farm(pos_farm)
+    end
   end
 
   def pos_farm
@@ -45,6 +50,14 @@ class Controller
       3.times do |y|
         return x+y*4 if mcheck(30+(FARM_SIZE+10)*x,30+(FARM_SIZE+10)*y,30+FARM_SIZE+(FARM_SIZE+10)*x,30+FARM_SIZE+(FARM_SIZE+10)*y)
       end
+    end
+    return -1
+  end
+
+  def pos_shop
+    seeds = @game.seeds_of_season
+    seeds.each_with_index do |s,i|
+      return i if mcheck(30, 30+24*i, 200, 50+24*i)
     end
     return -1
   end
@@ -57,7 +70,7 @@ class Controller
   end
 
   def pos_main_menu
-    MAIN_MENU_TEXT.each_with_index do |menu, i|
+    20.times do |i|
       return i if(mcheck(640-MAIN_MENU_WIDTH, HEADER_HEIGHT+MENU_EACH_HEIGHT*i, 640, HEADER_HEIGHT+MENU_EACH_HEIGHT*(i+1)))
     end
     return -1
