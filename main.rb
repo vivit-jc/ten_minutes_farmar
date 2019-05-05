@@ -43,7 +43,7 @@ SEEDS = [{name: "ジャガイモ", kind: :veg, planting: [0,1], grow: [1], cost:
 
 
 HEADER_HEIGHT = 60
-MESSAGE_BOX_HEIGHT = 80
+MESSAGE_BOX_HEIGHT = 40
 MAIN_MENU_WIDTH = 180
 MENU_EACH_HEIGHT = 30
 FARM_SIZE = 100

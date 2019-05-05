@@ -31,6 +31,7 @@ class View
       draw_shop
     else
       draw_farm
+      draw_crops
     end
     draw_messages
   end
@@ -38,12 +39,16 @@ class View
   def draw_farm
     4.times do |x|
       3.times do |y|
+        farm = @game.farm[x+y*4]
         Window.draw(30+(FARM_SIZE+10)*x,30+(FARM_SIZE+10)*y, @game.selecting_farm == x+y*4 ? @farmback_selected : @farmback)
-        if @game.farm[x+y*4][:kind] == :wasteland
+        if farm[:kind] == :wasteland
           Window.draw_font(45+(FARM_SIZE+10)*x, 41+(FARM_SIZE+10)*y, "開墾", Font16)
-          Window.draw_font(45+(FARM_SIZE+10)*x, 61+(FARM_SIZE+10)*y, "#{@game.farm[x+y*4][:prog]}/#{@game.farm[x+y*4][:max]}", Font16)
-        else
-          Window.draw_font(52+(FARM_SIZE+10)*x, 50+(FARM_SIZE+10)*y, @game.farm[x+y*4][:str], Font16)
+          Window.draw_font(45+(FARM_SIZE+10)*x, 61+(FARM_SIZE+10)*y, "#{farm[:prog]}/#{farm[:max]}", Font16)
+        elsif farm[:kind] == :land
+          Window.draw_font(45+(FARM_SIZE+10)*x, 41+(FARM_SIZE+10)*y, farm[:str], Font16)
+        elsif farm[:kind] == :plant
+          Window.draw_font(41+(FARM_SIZE+10)*x, 41+(FARM_SIZE+10)*y, farm[:str], Font16)        
+          Window.draw_font(41+(FARM_SIZE+10)*x, 41+(FARM_SIZE+10)*y+20, farm[:str2], Font16)
         end
       end
     end
@@ -82,18 +87,31 @@ class View
     end
   end
 
+  def draw_crops
+    @game.have_crops.each_with_index do |c,i|
+      Window.draw_font(10+140*(i%3), 360+19*((i/3).floor), "#{c[:name]} x#{c[:amount]}", Font16)
+    end
+  end
+
   def draw_header
     date = @game.date
     Window.draw_font(640 - MAIN_MENU_WIDTH, 4, "#{date[:year]}年目 #{season_j(date[:season])} 第#{date[:week]+1}週", Font22)
     Window.draw_font(640 - MAIN_MENU_WIDTH+4, 33, "資金:#{@game.money} 評判:#{@game.reputation}", Font22)
+    str = ""
+    4.times do |i|
+      str += date[:week] > i ? "●　" : "○　"
+    end
+    Window.draw_font(160, 4, str, Font22)
+    
   end
 
   def draw_main_menu
     if @game.mainmenu == :seeds
-      @game.have_seeds.each_with_index do |h,i|
+      seeds = @game.have_seeds_of_season
+      seeds.each_with_index do |h,i|
         Window.draw_font(640 - MAIN_MENU_WIDTH + 30, HEADER_HEIGHT+MENU_EACH_HEIGHT*i+5, h[:name]+" x"+h[:amount].to_s, Font20, mouseover_color(@controller.pos_main_menu == i)) 
       end
-      Window.draw_font(640 - MAIN_MENU_WIDTH + 30, HEADER_HEIGHT+MENU_EACH_HEIGHT*@game.have_seeds.size+5, "戻る", Font20, mouseover_color(@controller.pos_main_menu == @game.have_seeds.size)) 
+      Window.draw_font(640 - MAIN_MENU_WIDTH + 30, HEADER_HEIGHT+MENU_EACH_HEIGHT*seeds.size+5, "戻る", Font20, mouseover_color(@controller.pos_main_menu == seeds.size)) 
     else
       MAIN_MENU_TEXT.each_with_index do |(k,v),i|
         Window.draw_font(640 - MAIN_MENU_WIDTH + 30, HEADER_HEIGHT+MENU_EACH_HEIGHT*i+5, v, Font20, mouseover_color(@controller.pos_main_menu == i)) 
@@ -117,7 +135,7 @@ class View
   end
 
   def season_j(num)
-    ["春","夏","秋","冬"][num]
+    ["春","夏","秋","冬"][num%4]
   end
 
   def draw_xy
