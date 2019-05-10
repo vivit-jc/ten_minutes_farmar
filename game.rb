@@ -1,6 +1,9 @@
 class Game
+
+require_remote './order.rb'
+
   attr_reader :status, :game_status, :mainview, :mainmenu, :debug_arg, :messages, :farm, :date, :money, :reputation, :seeds,
-  	:selecting_farm, :crops
+  	:selecting_farm, :crops, :part, :part_action, :order, :orders
 
   def initialize
   	@status = :title
@@ -15,6 +18,9 @@ class Game
     @seeds = @seeds.map{|s|s.merge({amount: 0, picked: false})}
     @crops = SEEDS.map{|s|{name: s[:name], amount: 0}}
     @part = 0
+    @part_action = false
+    @order = Order.new(@crops)
+    @orders = @order.orders
 
   	@messages = Array.new(3)
   	@debug_arg = 0
@@ -50,16 +56,25 @@ class Game
   def select_command(pos)
   	p "select_command"
   	return if pos >= MAIN_MENU_TEXT.size
-  	case MAIN_MENU_TEXT.to_a[pos][0]
+    sym = MAIN_MENU_TEXT.to_a[pos][0]
+    @part_action = false if sym != :part
+
+  	case sym
   	when :farm
   	  @mainview = :farm
   	  @game_status = :none
+    when :orders
+      @mainview = :orders
+      @game_status = :orders
   	when :cooperative
   	  @mainview = :shop
-	  @game_status = :shop
+	    @game_status = :shop
   	when :part
-  	  @debug_arg += 10
-  	  gain_time
+  	  if @part_action
+        @part_action = false
+      else 
+        @part_action = true
+      end
   	end
   end
 
@@ -85,7 +100,20 @@ class Game
   	@mainmenu = :command
   	@selecting_farm = -1
   	@messages[0] = farm[:str]+"を植えた"
-  	gain_time
+    gain_time
+  end
+
+  def click_order(pos)
+    p "click_order"
+    unless @order.satisfy?(pos)
+      @messages[0] = "受注できる量の品物が無い"
+      return 
+    end
+
+    order = @orders[pos]
+    @order.fill_order(pos)
+    @reputation += order[:rep]
+    @messages[0] = "ok"
   end
 
   def click_shop(pos)
@@ -138,22 +166,27 @@ class Game
   end
 
   def gain_time
+    if @part_action
+      @part += 1
+      return
+    end
+
   	@date[:week] += 1
   	if @date[:week] == 4
-  	  @date[:week] = 0
-  	  @date[:season] += 1
-  	  @farm.each_with_index do |farm,i|
-  	  	if farm[:kind] == :plant
-  	  	  farm[:plant][:prog] += 1
-  	  	  farm[:plant][:picked] = false
-  	  	  farm[:str2] = grow_str(i)
-  	  	end
-  	  end
-  	end
-  	if @date[:season] == 4
-  	  @date[:season] = 0
-  	  @date[:year] += 1
-  	end
+	    @date[:week] = 0
+	    @date[:season] += 1
+	    @farm.each_with_index do |farm,i|
+	  	  if farm[:kind] == :plant
+	  	    farm[:plant][:prog] += 1
+	  	    farm[:plant][:picked] = false
+	  	    farm[:str2] = grow_str(i)
+	  	  end
+	    end
+	  end
+	  if @date[:season] == 4
+	    @date[:season] = 0
+	    @date[:year] += 1
+	  end
   end
 
   def init_farm

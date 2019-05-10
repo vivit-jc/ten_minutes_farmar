@@ -40,6 +40,8 @@ class Controller
       @game.click_menu(pos_main_menu)
     elsif @game.mainview == :shop && pos_shop != -1
       @game.click_shop(pos_shop)
+    elsif @game.mainview == :orders && pos_order != -1
+      @game.click_order(pos_order)
     elsif @game.mainview == :farm && pos_farm != -1
       @game.click_farm(pos_farm)
     end
@@ -54,10 +56,17 @@ class Controller
     return -1
   end
 
+  def pos_order
+    return pos_main_view_list(@game.orders.size)
+  end
+
   def pos_shop
-    seeds = @game.seeds_of_season
-    seeds.each_with_index do |s,i|
-      return i if mcheck(30, 30+24*i, 200, 50+24*i)
+    return pos_main_view_list(@game.seeds_of_season.size)
+  end
+
+  def pos_main_view_list(size)
+    size.times do |i|
+      return i if mcheck(MAIN_VIEW_LIST_X, MAIN_VIEW_LIST_Y+24*i, MAIN_VIEW_LIST_X+MAIN_VIEW_LIST_WIDTH, MAIN_VIEW_LIST_Y+20+24*i)
     end
     return -1
   end

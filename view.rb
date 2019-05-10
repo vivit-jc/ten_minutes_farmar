@@ -29,11 +29,18 @@ class View
     case(@game.mainview)
     when :shop
       draw_shop
+    when :orders
+      draw_orders
     else
       draw_farm
-      draw_crops
     end
+    draw_crops
     draw_messages
+    draw_part_timer if @game.part_action
+  end
+
+  def draw_part_timer
+    Window.draw_font(10, PART_Y, "パートさんに指示を出しています(@30G) #{@game.part}/1", Font20) 
   end
 
   def draw_farm
@@ -54,11 +61,26 @@ class View
     end
   end
 
+  def draw_orders
+    orders = @game.orders
+    orders.each_with_index do |o,i|
+      if !@game.order.satisfy?(i)
+        color = {color: GRAY}
+      else
+        color = mouseover_color(@controller.pos_order == i)
+      end
+      Window.draw_font(MAIN_VIEW_LIST_X, MAIN_VIEW_LIST_Y+24*i, "#{o[:crop]}", Font20, color)
+      Window.draw_font(MAIN_VIEW_LIST_X+150, MAIN_VIEW_LIST_Y+24*i, "数量:#{o[:amount]}", Font20, color)
+      Window.draw_font(MAIN_VIEW_LIST_X+230, MAIN_VIEW_LIST_Y+24*i, "期限:#{o[:waiting]}", Font20, color)
+      Window.draw_font(MAIN_VIEW_LIST_X+300, MAIN_VIEW_LIST_Y+24*i, "#{o[:count]}/#{o[:max]}", Font20, color)
+    end
+  end
+
   def draw_shop
     seeds = @game.seeds_of_season
     seeds.each_with_index do |s,i|
       amount = @game.seeds.find{|e|e[:name] == s[:name]}[:amount]
-      Window.draw_font(30, 30+24*i, "#{s[:name]} x#{amount}", Font20, mouseover_color(@controller.pos_shop == i))
+      Window.draw_font(MAIN_VIEW_LIST_X, MAIN_VIEW_LIST_Y+24*i, "#{s[:name]} x#{amount}", Font20, mouseover_color(@controller.pos_shop == i))
     end
     if @controller.pos_shop != -1
       s = seeds[@controller.pos_shop]
@@ -89,14 +111,14 @@ class View
 
   def draw_crops
     @game.have_crops.each_with_index do |c,i|
-      Window.draw_font(10+140*(i%3), 360+19*((i/3).floor), "#{c[:name]} x#{c[:amount]}", Font16)
+      Window.draw_font(10+140*(i%3), CROPS_Y+19*((i/3).floor), "#{c[:name]} x#{c[:amount]}", Font16)
     end
   end
 
   def draw_header
     date = @game.date
     Window.draw_font(640 - MAIN_MENU_WIDTH, 4, "#{date[:year]}年目 #{season_j(date[:season])} 第#{date[:week]+1}週", Font22)
-    Window.draw_font(640 - MAIN_MENU_WIDTH+4, 33, "資金:#{@game.money} 評判:#{@game.reputation}", Font22)
+    Window.draw_font(640 - MAIN_MENU_WIDTH+4, 33,"#{@game.money}G #{@game.reputation}rp", Font22)
     str = ""
     4.times do |i|
       str += date[:week] > i ? "●　" : "○　"
@@ -114,7 +136,12 @@ class View
       Window.draw_font(640 - MAIN_MENU_WIDTH + 30, HEADER_HEIGHT+MENU_EACH_HEIGHT*seeds.size+5, "戻る", Font20, mouseover_color(@controller.pos_main_menu == seeds.size)) 
     else
       MAIN_MENU_TEXT.each_with_index do |(k,v),i|
-        Window.draw_font(640 - MAIN_MENU_WIDTH + 30, HEADER_HEIGHT+MENU_EACH_HEIGHT*i+5, v, Font20, mouseover_color(@controller.pos_main_menu == i)) 
+        if(k == :part && @game.part_action)
+          color = {color: YELLOW}
+        else
+          color = mouseover_color(@controller.pos_main_menu == i)
+        end
+        Window.draw_font(640 - MAIN_MENU_WIDTH + 30, HEADER_HEIGHT+MENU_EACH_HEIGHT*i+5, v, Font20, color) 
       end
     end
   end

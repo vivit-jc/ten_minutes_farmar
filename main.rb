@@ -24,7 +24,8 @@ TITLE_MENU_X = 30
 TITLE_MENU_Y = [360,392,424]
 TITLE_MENU_TEXT = ["START","STATS","RANKING"]
 
-MAIN_MENU_TEXT = {farm: "牧場", shed: "畜舎", order: "注文", market: "市場", cooperative: "農協", townhall: "役場", accounts: "会計", part: "パートを雇う"}
+MAIN_MENU_TEXT = {farm: "牧場", shed: "畜舎", orders: "注文", market: "市場", cooperative: "農協", townhall: "役場",
+ diary: "手帳", accounts: "会計", part: "パートを雇う"}
 
 SEEDS = [{name: "ジャガイモ", kind: :veg, planting: [0,1], grow: [1], cost: 20, value: 80},
 {name: "キャベツ", kind: :veg, planting: [0,1], grow: [1], cost: 20, value: 80},
@@ -41,12 +42,16 @@ SEEDS = [{name: "ジャガイモ", kind: :veg, planting: [0,1], grow: [1], cost:
 {name: "ユリ", kind: :flo, planting: [2], grow: [3], cost: 20, value: 80}
 ]
 
-
+MAIN_VIEW_LIST_X = 30
+MAIN_VIEW_LIST_Y = 30
+MAIN_VIEW_LIST_WIDTH = 400
 HEADER_HEIGHT = 60
-MESSAGE_BOX_HEIGHT = 40
+MESSAGE_BOX_HEIGHT = 30
 MAIN_MENU_WIDTH = 180
 MENU_EACH_HEIGHT = 30
 FARM_SIZE = 100
+CROPS_Y = 360
+PART_Y = 420
 
 Font12 = Font.new(12)
 Font16 = Font.new(16)
