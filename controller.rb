@@ -38,12 +38,14 @@ class Controller
   def click_on_game
     if pos_main_menu != -1
       @game.click_menu(pos_main_menu)
-    elsif @game.mainview == :shop && pos_shop != -1
-      @game.click_shop(pos_shop)
-    elsif @game.mainview == :orders && pos_order != -1
-      @game.click_order(pos_order)
     elsif @game.mainview == :farm && pos_farm != -1
       @game.click_farm(pos_farm)
+    elsif @game.mainview == :orders && pos_order != -1
+      @game.click_order(pos_order)
+    elsif @game.mainview == :market && pos_market != -1
+      @game.click_market(pos_market)
+    elsif @game.mainview == :shop && pos_shop != -1
+      @game.click_shop(pos_shop)
     end
   end
 
@@ -58,6 +60,10 @@ class Controller
 
   def pos_order
     return pos_main_view_list(@game.orders.size)
+  end
+
+  def pos_market
+    return pos_main_view_list(@game.market.prices_in_season(@game.crops_of_season).size)
   end
 
   def pos_shop

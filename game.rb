@@ -1,9 +1,10 @@
 class Game
 
+require_remote './market.rb'
 require_remote './order.rb'
 
   attr_reader :status, :game_status, :mainview, :mainmenu, :debug_arg, :messages, :farm, :date, :money, :reputation, :seeds,
-  	:selecting_farm, :crops, :part, :part_action, :order, :orders
+  	:selecting_farm, :crops, :part, :part_action, :order, :orders, :market, :prices
 
   def initialize
   	@status = :title
@@ -19,8 +20,11 @@ require_remote './order.rb'
     @crops = SEEDS.map{|s|{name: s[:name], amount: 0}}
     @part = 0
     @part_action = false
+    
     @order = Order.new(@crops)
     @orders = @order.orders
+    @market = Market.new
+    @prices = @market.prices
 
   	@messages = Array.new(3)
   	@debug_arg = 0
@@ -54,7 +58,6 @@ require_remote './order.rb'
   end
 
   def select_command(pos)
-  	p "select_command"
   	return if pos >= MAIN_MENU_TEXT.size
     sym = MAIN_MENU_TEXT.to_a[pos][0]
     @part_action = false if sym != :part
@@ -66,6 +69,9 @@ require_remote './order.rb'
     when :orders
       @mainview = :orders
       @game_status = :orders
+    when :market
+      @mainview = :market
+      @game_status = :market
   	when :cooperative
   	  @mainview = :shop
 	    @game_status = :shop
@@ -79,7 +85,6 @@ require_remote './order.rb'
   end
 
   def select_seeds(pos)
-  	p "select_seeds", pos
   	farm = @farm[@selecting_farm]
   	seeds = have_seeds_of_season
   	if pos > seeds.size
@@ -101,26 +106,6 @@ require_remote './order.rb'
   	@selecting_farm = -1
   	@messages[0] = farm[:str]+"を植えた"
     gain_time
-  end
-
-  def click_order(pos)
-    p "click_order"
-    unless @order.satisfy?(pos)
-      @messages[0] = "受注できる量の品物が無い"
-      return 
-    end
-
-    order = @orders[pos]
-    @order.fill_order(pos)
-    @reputation += order[:rep]
-    @messages[0] = "ok"
-  end
-
-  def click_shop(pos)
-  	seed = seeds_of_season[pos]
-  	@seeds.each do |s|
-      s[:amount] += 1 if s[:name] == seed[:name]
-    end
   end
 
   def click_farm(farm_pos)
@@ -147,6 +132,38 @@ require_remote './order.rb'
       	clean_farm(farm_pos)
   	    @messages[0] = "畑を片付けた"
       end
+    end
+  end
+
+  def click_order(pos)
+    unless @order.satisfy?(pos)
+      @messages[0] = "受注できる量の品物が無い"
+      return 
+    end
+
+    order = @orders[pos]
+    @order.fill_order(pos)
+    @reputation += order[:rep]
+    @messages[0] = "ok"
+  end
+
+  def click_market(pos)
+    crop_name = crops_of_season[pos]
+    crop = @crops.find{|c|c[:name] == crop_name}
+    if crop[:amount] < 1
+      @messages[0] = "品物が無い"
+      return
+    end
+    price = @prices.find{|p|p[:name] == crop_name}
+    crop[:amount] -= 1
+    @money += price[:price]
+    @messages[0] = ""
+  end
+
+  def click_shop(pos)
+    seed = seeds_of_season[pos]
+    @seeds.each do |s|
+      s[:amount] += 1 if s[:name] == seed[:name]
     end
   end
 
@@ -198,8 +215,29 @@ require_remote './order.rb'
     @selecting_farm = -1
   end
 
-  def seeds_of_season
-  	SEEDS.select{|s|s[:planting].include?(@date[:season])}
+  def seeds_of_season(season = @date[:season])
+  	SEEDS.select{|s|s[:planting].include?(season)}
+  end
+
+  def crops_of_season(season = @date[:season])
+    #名前の文字列配列を返す
+    #ハッシュ配列ではないことに注意！（名前文字列から検索して目的のハッシュ配列を作るため）
+    crops = []
+    SEEDS.each do |s|
+      if s[:kind] == :flu
+        crops.push s[:name] if season == 2
+      elsif s[:planting].size >= 2
+        grow = s[:planting].map{|g|(g+s[:grow][0])%4}
+        crops.push s[:name] if grow.include?(season)
+      elsif s[:grow].size >= 2
+        grow = s[:grow].map{|g|(g+s[:planting][0])%4}
+        crops.push s[:name] if grow.include?(season)
+      else
+        crops.push s[:name] if (s[:grow][0]+s[:planting][0])%4 == season
+      end
+    end
+
+    return crops
   end
 
   def have_seeds

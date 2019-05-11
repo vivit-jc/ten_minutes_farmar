@@ -27,10 +27,12 @@ class View
     draw_header
     draw_main_menu
     case(@game.mainview)
-    when :shop
-      draw_shop
     when :orders
       draw_orders
+    when :market
+      draw_market
+    when :shop
+      draw_shop
     else
       draw_farm
     end
@@ -73,6 +75,15 @@ class View
       Window.draw_font(MAIN_VIEW_LIST_X+150, MAIN_VIEW_LIST_Y+24*i, "数量:#{o[:amount]}", Font20, color)
       Window.draw_font(MAIN_VIEW_LIST_X+230, MAIN_VIEW_LIST_Y+24*i, "期限:#{o[:waiting]}", Font20, color)
       Window.draw_font(MAIN_VIEW_LIST_X+300, MAIN_VIEW_LIST_Y+24*i, "#{o[:count]}/#{o[:max]}", Font20, color)
+    end
+  end
+
+  def draw_market
+    prices = @game.market.prices_in_season(@game.crops_of_season)
+    prices.each_with_index do |p,i|
+      color = mouseover_color(@controller.pos_market == i)
+      Window.draw_font(MAIN_VIEW_LIST_X, MAIN_VIEW_LIST_Y+24*i, "#{p[:name]}", Font20, color)
+      Window.draw_font(MAIN_VIEW_LIST_X+150, MAIN_VIEW_LIST_Y+24*i, "#{p[:price]}G", Font20, color)
     end
   end
 
